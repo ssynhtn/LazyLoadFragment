@@ -1,15 +1,17 @@
-# 无需继承的懒加载Fragment
+# Lazy Load Fragment that works with viewpager
+It's a drop in replacement, no subclassing required
 
-# 使用方法
+# Usage
 
-在`FragmentPagerAdapter.getItem()/FragmentStatePagerAdapter.getItem()`中，将你的Fragment替换成
+In`FragmentPagerAdapter.getItem()/FragmentStatePagerAdapter.getItem()`中，replace `new YourFragment()` with
 
 `LazyLoadFragment.newInstance(YourFragment.class)`
 
-如果需要Fragment延迟若干秒后自动加载，可以使用
+If you need your fragment to automatically start loading in the background after a specified delay, use
 
 `LazyLoadFragment.newInstance(YourFragment.class, DELAY_MILLIS)`
 
-如果你的Fragment需要传入参数，具体使用请参考demo中对`FragmentFactory`的使用
+If your fragment needs arguments, please read the demo which contains usage of `FragmentFactory`
 
+[中文说明](readme_cn.md)
 <img src="screenshot.gif" width="400px" alt="lazy load fragment in viewpager demo"/>
