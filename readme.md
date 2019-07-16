@@ -2,7 +2,7 @@
 
 # 使用方法
 
-在`FragmentPagerAdapter.getItem()`中，将你的Fragment替换成
+在`FragmentPagerAdapter.getItem()/FragmentStatePagerAdapter.getItem()`中，将你的Fragment替换成
 
 `LazyLoadFragment.newInstance(YourFragment.class)`
 
