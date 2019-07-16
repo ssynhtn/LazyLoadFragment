@@ -12,4 +12,4 @@
 
 如果你的Fragment需要传入参数，具体使用请参考demo中对`FragmentFactory`的使用
 
-<img src="screenshot.gif" width="400px" alt="lazy load fragment in viewpager demo"/>
+<img src="screenshot.gif" width="400px" alt="fragment懒加载"/>
