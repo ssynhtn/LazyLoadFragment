@@ -27,20 +27,13 @@ public class MainAdapter extends FragmentPagerAdapter {
             return contentFragment;
         } else if (position == 1) {
             return LazyLoadFragment.newInstance(SimpleFragment.class, -1);
-        } else if (position == 2){
-            return LazyLoadFragment.newInstance(new FragmentFactory() {
-                @Override
-                public Fragment createFragment() {
-                    return SimpleFragment.newInstance(position);
-                }
-            }, -1);
         } else {
             return LazyLoadFragment.newInstance(new FragmentFactory() {
                 @Override
                 public Fragment createFragment() {
                     return SimpleFragment.newInstance(position);
                 }
-            });
+            }, -1);
         }
     }
 
