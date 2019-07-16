@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:id="@+id/rootView"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <androidx.viewpager.widget.ViewPager
+        android:id="@+id/view_pager"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+
+        />
+
+    <View
+        android:id="@+id/sep_line"
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:background="#C8C8C8"
+        />
+
+    <RadioGroup
+        android:id="@+id/main_rg"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white"
+        android:orientation="horizontal"
+        >
+
+        <RadioButton
+            android:id="@+id/rb_home"
+            style="@style/main_tab_bottom"
+            android:text="首页"
+            />
+
+        <RadioButton
+            android:id="@+id/rb_study"
+            style="@style/main_tab_bottom"
+            android:text="上课"
+            />
+
+        <RadioButton
+            android:id="@+id/rb_my"
+            style="@style/main_tab_bottom"
+
+            android:text="我的"
+            />
+
+        <RadioButton
+            android:id="@+id/rb_fourth"
+            style="@style/main_tab_bottom"
+            android:text="Fourth"
+            />
+
+        <RadioButton
+            android:id="@+id/rb_fifth"
+            style="@style/main_tab_bottom"
+            android:text="Fifth"
+            />
+    </RadioGroup>
+
+</LinearLayout>
