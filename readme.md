@@ -4,7 +4,7 @@
 
 在`FragmentPagerAdapter.getItem()`中，将你的Fragment替换成
 
-`LazyLoadFragment.newInstance(YourFragment.class, -1)`
+`LazyLoadFragment.newInstance(YourFragment.class)`
 
 如果需要Fragment延迟若干秒后自动加载，可以使用
 

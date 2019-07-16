@@ -8,7 +8,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -26,11 +25,10 @@ public class LazyLoadFragment extends Fragment {
     private static final String EXTRA_DELAY = "EXTRA_DELAY";
     private static final String EXTRA_FRAG_FACTORY = "EXTRA_FRAG_FACTORY";
     private static final String EXTRA_CUSTOM_LAYOUT = "EXTRA_CUSTOM_LAYOUT";
-    private static final long DEFAULT_DELAY = 2000;
     private String TAG = LazyLoadFragment.class.getSimpleName();
 
     public static LazyLoadFragment newInstance(Class<? extends Fragment> clazz) {
-        return newInstance(clazz, DEFAULT_DELAY);
+        return newInstance(clazz, -1);
     }
 
     public static LazyLoadFragment newInstance(Class<? extends Fragment> clazz, long delay) {
@@ -39,7 +37,7 @@ public class LazyLoadFragment extends Fragment {
 
 
     public static LazyLoadFragment newInstance(FragmentFactory factory) {
-        return newInstance(factory, DEFAULT_DELAY);
+        return newInstance(factory, -1);
     }
 
     public static LazyLoadFragment newInstance(FragmentFactory factory, long delay) {
@@ -86,7 +84,7 @@ public class LazyLoadFragment extends Fragment {
             @Override
             public void onChanged(@Nullable Boolean aBoolean) {
                 if (aBoolean != null && aBoolean) {
-                    addFragment("delayedAdd", true);
+                    addFragment("delayedAdd");
                 }
             }
         });
@@ -95,11 +93,12 @@ public class LazyLoadFragment extends Fragment {
         boolean hasFragment = getChildFragmentManager().findFragmentById(R.id.container) != null;
         if (hasFragment) {
             progressBar.setVisibility(View.GONE);
+            return;
         }
 
         if (getUserVisibleHint()) {
-            addFragment("onViewCreated", false);
-        } else if (!hasFragment) {
+            addFragment("onViewCreated");
+        } else {
             long delay = 0;
             if (getArguments() != null) {
                 delay = getArguments().getLong(EXTRA_DELAY);
@@ -117,7 +116,7 @@ public class LazyLoadFragment extends Fragment {
         super.onResume();
 
         if (getUserVisibleHint()) {
-            addFragment("onResume", true);
+            addFragment("onResume");
         }
     }
 
@@ -127,30 +126,26 @@ public class LazyLoadFragment extends Fragment {
 
         Log.d(TAG, "setVisibilityHint " + isVisibleToUser);
         if (isVisibleToUser && isResumed()) {
-            addFragment("setUserVisibleHint", true);
+            addFragment("setUserVisibleHint");
         }
     }
 
 
 
-    private void addFragment(String cause, boolean animate) {
+    private void addFragment(String cause) {
         Log.d(TAG, "ready to add fragment by cause " + cause);
         if (getChildFragmentManager().findFragmentById(R.id.container) == null) {
             getChildFragmentManager().beginTransaction()
                     .setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out)
                     .add(R.id.container, createFragment()).commit();
             Log.d(TAG, "added fragment by cause " + cause);
-            if (animate) {
-                progressBar.animate().alpha(0).setDuration(getResources().getInteger(android.R.integer.config_mediumAnimTime)).setListener(new AnimatorListenerAdapter() {
-                    @Override
-                    public void onAnimationEnd(Animator animation) {
-                        super.onAnimationEnd(animation);
-                        progressBar.setVisibility(View.GONE);
-                    }
-                }).start();
-            } else {
-                progressBar.setVisibility(View.GONE);
-            }
+            progressBar.animate().alpha(0).setDuration(getResources().getInteger(android.R.integer.config_mediumAnimTime)).setListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    super.onAnimationEnd(animation);
+                    progressBar.setVisibility(View.GONE);
+                }
+            }).start();
         }
     }
 
