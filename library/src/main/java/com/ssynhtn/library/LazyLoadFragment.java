@@ -92,7 +92,9 @@ public class LazyLoadFragment extends Fragment {
         progressBar = view.findViewById(R.id.progress);
         boolean hasFragment = getChildFragmentManager().findFragmentById(R.id.container) != null;
         if (hasFragment) {
-            progressBar.setVisibility(View.GONE);
+            if (progressBar != null) {
+                progressBar.setVisibility(View.GONE);
+            }
             return;
         }
 
@@ -139,13 +141,15 @@ public class LazyLoadFragment extends Fragment {
                     .setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out)
                     .add(R.id.container, createFragment()).commit();
             Log.d(TAG, "added fragment by cause " + cause);
-            progressBar.animate().alpha(0).setDuration(getResources().getInteger(android.R.integer.config_mediumAnimTime)).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    super.onAnimationEnd(animation);
-                    progressBar.setVisibility(View.GONE);
-                }
-            }).start();
+            if (progressBar != null) {
+                progressBar.animate().alpha(0).setDuration(getResources().getInteger(android.R.integer.config_mediumAnimTime)).setListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        super.onAnimationEnd(animation);
+                        progressBar.setVisibility(View.GONE);
+                    }
+                }).start();
+            }
         }
     }
 
