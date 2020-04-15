@@ -11,8 +11,9 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProvider;
 
 
 /**
@@ -25,6 +26,7 @@ public class LazyLoadFragment extends Fragment {
     private static final String EXTRA_DELAY = "EXTRA_DELAY";
     private static final String EXTRA_FRAG_FACTORY = "EXTRA_FRAG_FACTORY";
     private static final String EXTRA_CUSTOM_LAYOUT = "EXTRA_CUSTOM_LAYOUT";
+    private static final String EXTRA_ANIMATE = "EXTRA_ANIMATE";
     private String TAG = LazyLoadFragment.class.getSimpleName();
 
     public static LazyLoadFragment newInstance(Class<? extends Fragment> clazz) {
@@ -41,9 +43,14 @@ public class LazyLoadFragment extends Fragment {
     }
 
     public static LazyLoadFragment newInstance(FragmentFactory factory, long delay) {
+        return newInstance(factory, delay, true);
+    }
+
+    public static LazyLoadFragment newInstance(FragmentFactory factory, long delay, boolean animate) {
         Bundle args = new Bundle();
         args.putSerializable(EXTRA_FRAG_FACTORY, factory);
         args.putLong(EXTRA_DELAY, delay);
+        args.putBoolean(EXTRA_ANIMATE, animate);
 
         LazyLoadFragment fragment = new LazyLoadFragment();
         fragment.setArguments(args);
@@ -80,9 +87,10 @@ public class LazyLoadFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        ViewModelProviders.of(this).get(LazyLoadViewModel.class).liveData.observe(this, new Observer<Boolean>() {
+        LazyLoadViewModel viewModel = new ViewModelProvider(this, ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().getApplication())).get(LazyLoadViewModel.class);
+        viewModel.liveData.observe(getViewLifecycleOwner(), new Observer<Boolean>() {
             @Override
-            public void onChanged(@Nullable Boolean aBoolean) {
+            public void onChanged(Boolean aBoolean) {
                 if (aBoolean != null && aBoolean) {
                     addFragment("delayedAdd");
                 }
@@ -98,57 +106,51 @@ public class LazyLoadFragment extends Fragment {
             return;
         }
 
-        if (getUserVisibleHint()) {
-            addFragment("onViewCreated");
-        } else {
-            long delay = 0;
-            if (getArguments() != null) {
-                delay = getArguments().getLong(EXTRA_DELAY);
-            }
-            
-            if (delay >= 0) {
-                ViewModelProviders.of(this).get(LazyLoadViewModel.class).addFragmentDelayed(delay);
-            }
-            
+        long delay = 0;
+        if (getArguments() != null) {
+            delay = getArguments().getLong(EXTRA_DELAY);
         }
+
+        if (delay >= 0) {
+            viewModel.addFragmentDelayed(delay);
+        }
+
     }
 
     @Override
     public void onResume() {
         super.onResume();
 
-        if (getUserVisibleHint()) {
-            addFragment("onResume");
-        }
+        addFragment("onResume");
     }
-
-    @Override
-    public void setUserVisibleHint(boolean isVisibleToUser) {
-        super.setUserVisibleHint(isVisibleToUser);
-
-        Log.d(TAG, "setVisibilityHint " + isVisibleToUser);
-        if (isVisibleToUser && isResumed()) {
-            addFragment("setUserVisibleHint");
-        }
-    }
-
 
 
     private void addFragment(String cause) {
         Log.d(TAG, "ready to add fragment by cause " + cause);
         if (getChildFragmentManager().findFragmentById(R.id.container) == null) {
-            getChildFragmentManager().beginTransaction()
-                    .setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out)
-                    .add(R.id.container, createFragment()).commit();
+            boolean animate = true;
+            if (getArguments() != null) {
+                animate = getArguments().getBoolean(EXTRA_ANIMATE, true);
+            }
+
+            FragmentTransaction ft = getChildFragmentManager().beginTransaction();
+            if (animate) {
+                ft.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out);
+            }
+            ft.add(R.id.container, createFragment()).commit();
             Log.d(TAG, "added fragment by cause " + cause);
             if (progressBar != null) {
-                progressBar.animate().alpha(0).setDuration(getResources().getInteger(android.R.integer.config_mediumAnimTime)).setListener(new AnimatorListenerAdapter() {
-                    @Override
-                    public void onAnimationEnd(Animator animation) {
-                        super.onAnimationEnd(animation);
-                        progressBar.setVisibility(View.GONE);
-                    }
-                }).start();
+                if (animate) {
+                    progressBar.animate().alpha(0).setDuration(getResources().getInteger(android.R.integer.config_mediumAnimTime)).setListener(new AnimatorListenerAdapter() {
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+                            super.onAnimationEnd(animation);
+                            progressBar.setVisibility(View.GONE);
+                        }
+                    }).start();
+                } else {
+                    progressBar.setVisibility(View.GONE);
+                }
             }
         }
     }

@@ -16,7 +16,7 @@ public class MainAdapter extends FragmentPagerAdapter {
     private final int childCount;
 
     public MainAdapter(FragmentManager fm, int childCount) {
-        super(fm);
+        super(fm, FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
         this.childCount = childCount;
     }
 

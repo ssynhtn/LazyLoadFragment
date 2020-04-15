@@ -20,6 +20,8 @@ allprojects {
         jcenter()
         
     }
+
+    apply from: "$rootProject.projectDir/config.gradle"
 }
 
 task clean(type: Delete) {
